@@ -2,12 +2,15 @@ package main
 
 import "core:fmt"
 import "core:net"
+import "core:os"
+import "core:strings"
+import "http"
 
 ADDR :: "0.0.0.0:1521"
 READ_BUF_SIZE :: 1024
 
-parse_request :: proc(request: []u8, client_socket: net.TCP_Socket) -> (int, net.Network_Error) {
-        return net.send_tcp(client_socket, request)
+find_file_path :: proc() {
+
 }
 
 main :: proc() {
@@ -37,6 +40,7 @@ main :: proc() {
             return
         }
         full_message: [dynamic]u8
+		len: int;
 
         read_loop: for {
             read_len, read_err := net.recv_tcp(client, buf); if err != nil {
@@ -44,6 +48,7 @@ main :: proc() {
                 break;
             }
             append(&full_message, ..buf[:])
+			len += read_len
 
             // If we have read less than full buf, message is over. We can end reading.
             if read_len < READ_BUF_SIZE {
@@ -51,5 +56,15 @@ main :: proc() {
             }
         }
 
+		tmp_st := "HTTP/1.1 200 OK\r\n\r\n"
+		file_content, file_err := os.read_entire_file_from_filename_or_err("./public/index.html"); if file_err != nil {
+			tmp_st = "HTTP/1.1 500 Internal Server Error\r\n"
+			http.parse_request(transmute([]u8)tmp_st, client)
+			continue
+		}
+
+		tmp_st = strings.concatenate({tmp_st, transmute(string)file_content})
+		http.parse_request(transmute([]u8)tmp_st, client)
+		// parse_request(full_message[:len], client)
     }
 }
