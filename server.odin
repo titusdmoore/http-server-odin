@@ -25,7 +25,7 @@ ParseEndpointError :: enum {
 
 initialize_server :: proc(address: string) -> (socket: net.TCP_Socket, err: Server_Initialize_Error) {
     endpoint, ok := net.parse_endpoint(address); if !ok {
-        return net.TCP_Socket{}, ParseEndpointError.None
+        return net.TCP_Socket{}, ParseEndpointError.EndpointError
     }
 
     return net.listen_tcp(endpoint)
@@ -62,12 +62,12 @@ accept_connection :: proc(server_socket: net.TCP_Socket) {
     tmp_st := "HTTP/1.1 200 OK\r\n\r\n"
     file_content, file_err := os.read_entire_file_or_err("./public/index.html"); if file_err != nil {
         tmp_st = "HTTP/1.1 500 Internal Server Error\r\n"
-        http.parse_request(transmute([]u8)tmp_st, client)
+        http.parse_request_and_echo(transmute([]u8)tmp_st, client)
         return
     }
 
     tmp_st = strings.concatenate({tmp_st, transmute(string)file_content})
-    http.parse_request(transmute([]u8)tmp_st, client)
+    http.parse_request_and_echo(transmute([]u8)tmp_st, client)
     // parse_request(full_message[:len], client)
 }
 

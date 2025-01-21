@@ -1,6 +1,8 @@
 package http 
 
 import "core:net"
+import "core:io"
+import "core:strings"
 
 Request :: struct {
         method: RequestMethod,
@@ -22,5 +24,7 @@ parse_request_and_echo :: proc(request: []u8, client_socket: net.TCP_Socket) -> 
 
 // Convert bool to error
 parse_request :: proc(request: []u8) -> (Request, bool) {
+		// r_reader := io.Reader{}
+		// strings.reader_init(&r_reader, transmute(string)request)
         return Request{}, true
 }
