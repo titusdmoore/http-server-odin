@@ -9,10 +9,6 @@ import "http"
 ADDR :: "0.0.0.0:1521"
 READ_BUF_SIZE :: 1024
 
-find_file_path :: proc() {
-
-}
-
 Server_Initialize_Error :: union #shared_nil {
     ParseEndpointError,
     net.Network_Error
@@ -25,7 +21,7 @@ ParseEndpointError :: enum {
 
 initialize_server :: proc(address: string) -> (socket: net.TCP_Socket, err: Server_Initialize_Error) {
     endpoint, ok := net.parse_endpoint(address); if !ok {
-        return net.TCP_Socket{}, ParseEndpointError.EndpointError
+        return net.TCP_Socket{}, ParseEndpointError.None
     }
 
     return net.listen_tcp(endpoint)
