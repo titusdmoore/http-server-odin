@@ -8,7 +8,8 @@ Request :: struct {
         method: RequestMethod,
         path: string,
         headers: map[string]string,
-        body: string
+        body: string,
+		client_socket: ^net.TCP_Socket
 }
 
 RequestMethod :: enum {
@@ -23,8 +24,16 @@ parse_request_and_echo :: proc(request: []u8, client_socket: net.TCP_Socket) -> 
 }
 
 // Convert bool to error
-parse_request :: proc(request: []u8) -> (Request, bool) {
-		// r_reader := io.Reader{}
-		// strings.reader_init(&r_reader, transmute(string)request)
-        return Request{}, true
+parse_request :: proc(request: []u8, socket: ^net.TCP_Socket) -> (Request, bool) {
+        return Request{
+			method = RequestMethod.GET,
+			path = "/",
+			headers = nil,
+			body = "",
+			client_socket = socket
+		}, true
+}
+
+send_response :: proc(response: []u8, request: Request) {
+        return net.send_tcp(request.client_socket^, response)
 }
