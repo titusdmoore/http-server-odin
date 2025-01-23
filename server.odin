@@ -14,8 +14,8 @@ main :: proc() {
         return
     }
     defer net.close(socket)
-
     fmt.println("Listening for connections on", ADDR)
+
     
     for {
         http.accept_connection(socket)

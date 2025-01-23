@@ -53,14 +53,17 @@ accept_connection :: proc(server_socket: net.TCP_Socket) {
         }
     }
 
+    request, is_ok := parse_request(full_message[:], &client); if !is_ok {
+        fmt.println("Unable to parse request")
+    }
+
     tmp_st := "HTTP/1.1 200 OK\r\n\r\n"
     file_content, file_err := os.read_entire_file_or_err("./public/index.html"); if file_err != nil {
         tmp_st = "HTTP/1.1 500 Internal Server Error\r\n"
-        parse_request_and_echo(transmute([]u8)tmp_st, client)
+        parse_request_and_echo(transmute([]u8)tmp_st, &client)
         return
     }
 
     tmp_st = strings.concatenate({tmp_st, transmute(string)file_content})
-    parse_request_and_echo(transmute([]u8)tmp_st, client)
-    // parse_request(full_message[:len], client)
+    parse_request_and_echo(transmute([]u8)tmp_st, &client)
 }
