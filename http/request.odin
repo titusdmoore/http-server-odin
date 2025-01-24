@@ -82,12 +82,3 @@ parse_request :: proc(request: []u8, socket: ^net.TCP_Socket) -> (Request, bool)
 		true
 }
 
-send_response :: proc(
-	response: []u8,
-	request: Request,
-) -> (
-	bytes_written: int,
-	err: net.Network_Error,
-) {
-	return net.send_tcp(request.client_socket^, response)
-}
