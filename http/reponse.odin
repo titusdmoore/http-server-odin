@@ -69,6 +69,9 @@ build_get_response :: proc(request: Request) -> string {
         return "HTTP/1.1 500 Internal Server Error\r\n"
     }
 
+    // ADD DEBUG WHEN TRUE CHECKS FOR ECHO
+    // TODO ECHO JUST PRINTS BODY
+
     
     resp_str := "HTTP/1.1 200 OK\r\n\r\n"
     file_content, file_err := os.read_entire_file_or_err(path_file.fullpath); if file_err != nil {

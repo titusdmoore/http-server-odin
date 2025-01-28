@@ -55,6 +55,7 @@ accept_connection :: proc(server_socket: net.TCP_Socket) {
 
     request, is_ok := parse_request(full_message[:], &client); if !is_ok {
         fmt.println("Unable to parse request")
+        return
     }
 
 
