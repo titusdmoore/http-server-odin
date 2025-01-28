@@ -8,6 +8,7 @@ import "core:net"
 import "core:fmt"
 
 SRC_PATH :: "./public"
+WITH_ECHO :: #config(WITH_ECHO, false)
 
 Reserved_Path :: struct {
     initial_path: string,
@@ -60,6 +61,13 @@ get_file_for_path :: proc(path: string) -> (file: os.File_Info, err: Path_Lookup
 }
 
 build_get_response :: proc(request: Request) -> string {
+    // If server was run with -define:WITH_ECHO=true add a special route that just prints the request
+    when WITH_ECHO {
+        if strings.compare(request.path, "/echo") == 0 {
+            return transmute(string)request.raw_request
+        }
+    }
+
     path_file, err := get_file_for_path(request.path); if err != nil {
         // 500 or possible 404
         if err == Lookup_Error.NotFound {
@@ -68,10 +76,6 @@ build_get_response :: proc(request: Request) -> string {
 
         return "HTTP/1.1 500 Internal Server Error\r\n"
     }
-
-    // ADD DEBUG WHEN TRUE CHECKS FOR ECHO
-    // TODO ECHO JUST PRINTS BODY
-
     
     resp_str := "HTTP/1.1 200 OK\r\n\r\n"
     file_content, file_err := os.read_entire_file_or_err(path_file.fullpath); if file_err != nil {
